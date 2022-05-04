@@ -4,6 +4,7 @@
 #include <iostream>
 #include <fstream> 
 #include <sstream>
+#include <utils/kernel.h>
 
 using namespace std;
 
@@ -20,6 +21,7 @@ class Image {
     int get_numrows();
     int get_numcols();
     int **get_array();
+    int **conv(Kernel k);
 };
 
 #endif // FIGURA_H
