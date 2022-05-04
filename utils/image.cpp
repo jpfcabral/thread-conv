@@ -61,7 +61,9 @@ int Image::get_numcols(){
     return numcols;
 }
 
-int** Image::conv(Kernel k){
+int** Image::conv(Kernel k, string filename){
+    ofstream file(filename);
+
     int **conv_array = (int**)malloc(numrows*sizeof(int*));
     for(int i = 0; i < numrows; i++){
         conv_array[i] = (int*)malloc(numcols*sizeof(int));
@@ -83,5 +85,15 @@ int** Image::conv(Kernel k){
         }
     }
 
+    file << "P2" << endl;
+    file << numcols << " " << numrows << endl;
+    file << 255 << endl;
+    for(int row = 0; row < numrows; ++row){
+        for (int col = 0; col < numcols; ++col){
+            file << conv_array[row][col] << " ";
+        }
+        file << endl;
+    }
+    file.close();
     return conv_array;
 }

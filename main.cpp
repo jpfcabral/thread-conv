@@ -6,5 +6,6 @@ int main(){
   int **array = img.get_array();
 
   Kernel k(3,3);
-  k.print_kernel();
+
+  img.conv(k, "images/3x3_glassware_noisy.ascii.pgm");
 }
