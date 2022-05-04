@@ -28,6 +28,14 @@ float **Kernel::get_kernel(){
     return kernel;
 }
 
+int Kernel::get_width(){
+    return width;
+}
+
+int Kernel::get_height(){
+    return height;
+}
+
 void Kernel::print_kernel(){
     for(int i = 0; i < height; i++){
         for(int j = 0; j < width; j++){
