@@ -17,10 +17,10 @@ Image::Image(string filename){
     ss << file.rdbuf();
     // Third line : size
     ss >> numcols >> numrows;
-    cout << numcols << " columns and " << numrows << " rows" << endl;
+    // cout << numcols << " columns and " << numrows << " rows" << endl;
     
     ss >> max_value;
-    cout << "Max value : " << max_value << endl;
+    // cout << "Max value : " << max_value << endl;
 
     shape[0] = numcols;
     shape[1] = numrows;
