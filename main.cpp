@@ -14,7 +14,7 @@ struct conv_data {
 void *convolutional_worker(void *arg){
   struct conv_data *data = (conv_data *)arg;
 
-  cout << "Convolving " << (string)data->filename << " with " << (int)data->kernel_size << "x" << (int)data->kernel_size << " kernel" << endl;
+  cout << "\nConvolving " << (string)data->filename << " with " << (int)data->kernel_size << "x" << (int)data->kernel_size << " kernel" << endl;
   Image img((string)data->filename);
   Kernel k((int)data->kernel_size, (int)data->kernel_size);
 
