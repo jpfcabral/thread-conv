@@ -21,7 +21,6 @@ class Image {
     int get_numrows();
     int get_numcols();
     int **get_array();
-    int **conv(Kernel k, string filename);
 };
 
 #endif // FIGURA_H

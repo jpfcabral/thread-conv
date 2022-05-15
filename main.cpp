@@ -6,21 +6,54 @@
 #define NUM_THREADS 3
 
 struct conv_data {
-  int kernel_size;
-  string filename;
+  Kernel *kernel;
+  Image *image;
   string output_filename;
 };
 
-void *convolutional_worker(void *arg){
-  struct conv_data *data = (conv_data *)arg;
+void *convolution(void *thread_data) {
+  struct conv_data *data = (struct conv_data *)thread_data;
+  Image *image = data->image;
+  Kernel *kernel = data->kernel;
+  string output_filename = data->output_filename;
 
-  cout << "\nConvolving " << (string)data->filename << " with " << (int)data->kernel_size << "x" << (int)data->kernel_size << " kernel" << endl;
-  Image img((string)data->filename);
-  Kernel k((int)data->kernel_size, (int)data->kernel_size);
+  int **conv_array = (int**)malloc(image->get_numrows()*sizeof(int*));
+  for(int i = 0; i < image->get_numrows(); i++){
+    conv_array[i] = (int*)malloc(image->get_numcols()*sizeof(int));
+  }
 
-  img.conv(k, data->output_filename);
-  cout << "Output written to " << data->output_filename << endl;
-  pthread_exit(NULL);
+  for(int row = 0; row < image->get_numrows(); ++row){
+    for (int col = 0; col < image->get_numcols(); ++col){
+      int sum = 0;
+      for(int i = 0; i < kernel->get_height(); i++){
+        for(int j = 0; j < kernel->get_width(); j++){
+          int kernel_row = row - i;
+          int kernel_col = col - j;
+          if(kernel_row >= 0 && kernel_col >= 0){
+            sum += image->get_array()[kernel_row][kernel_col] * kernel->get_kernel()[i][j];
+          }
+        }
+      }
+      conv_array[row][col] = sum;
+    }
+  }
+
+  ofstream file(output_filename);
+
+  file << "P2" << endl;
+  file << image->get_numcols() << " " << image->get_numrows() << endl;
+  file << 255 << endl;
+
+  for(int row = 0; row < image->get_numrows(); ++row){
+    for (int col = 0; col < image->get_numcols(); ++col){
+      file << conv_array[row][col] << " ";
+    }
+    file << endl;
+  }
+
+  file.close();
+
+  return NULL;
 }
 
 int main(int argc, char **argv){
@@ -34,11 +67,10 @@ int main(int argc, char **argv){
   pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
 
   for (int i = 0; i < NUM_THREADS; i++){
-    data[i].kernel_size = kernel_sizes[i];
-    data[i].filename = "images/glassware_noisy.ascii.pgm";
-    data[i].output_filename = "images/glassware_noisy_conv_" + to_string(i + 1) + ".ascii.pgm";
-
-    pthread_create(&threads[i], &attr, convolutional_worker, (void *)&data[i]);
+    data[i].kernel = new Kernel(kernel_sizes[i], kernel_sizes[i]);
+    data[i].image = new Image("images/glassware_noisy.ascii.pgm");
+    data[i].output_filename = "images/glassware_" + to_string(kernel_sizes[i]) + "_.ascii.pgm";
+    pthread_create(&threads[i], &attr, convolution, (void *)&data[i]);
   }
 
   pthread_attr_destroy(&attr);
@@ -46,4 +78,5 @@ int main(int argc, char **argv){
     pthread_join(threads[i], &status);
   }
   pthread_exit(NULL);
+  return 0;
 }
